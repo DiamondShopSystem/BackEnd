@@ -1,4 +1,4 @@
-const Accounts = require("../../models/accounts.model");
+const Accounts = require("../../models/account.model");
 const generateHelper = require("../../../../helpers/generate.helper");
 const md5 = require('md5');
 
@@ -35,6 +35,5 @@ module.exports.createPost = async (req, res) => {
             msg: "Không thể tạo tài khoản!"
         })
     }
-
 
 };
