@@ -14,6 +14,7 @@ module.exports.loginPost = async (req, res) => {
             email: email,
             deleted: false
         });
+        console.log(account);
         if (!account) {
             return res.json({
                 code: 401,

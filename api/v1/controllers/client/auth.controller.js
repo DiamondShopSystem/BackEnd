@@ -14,7 +14,7 @@ module.exports.loginPost = async (req, res) => {
         if (!user) {
             return res.json({
                 code: 205,
-                msg: "Tạo mới tài khoản"
+                msg: "Chưa có tài khoản!"
             });
         }
         if (account.status != "active") {
@@ -25,7 +25,7 @@ module.exports.loginPost = async (req, res) => {
         }
         return res.json({
             code: 200,
-            msg: "Đăng nhập thành công!",
+            msg: "Tìm thấy tài khoản!",
         })
     } catch (error) {
         return res.json({

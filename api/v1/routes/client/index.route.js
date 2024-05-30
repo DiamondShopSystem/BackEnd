@@ -1,3 +1,4 @@
+const authRoutes = require("./auth.route");
 
 
 module.exports = (app) => {
@@ -5,8 +6,7 @@ module.exports = (app) => {
     const version = "/api/v1";
 
 
-    app.use(version + `${PATH_ADMIN}`, authRoutes);
+    app.use(version , authRoutes);
 
-    app.use(version + `${PATH_ADMIN}/accounts`, accountRoutes);
 
 }

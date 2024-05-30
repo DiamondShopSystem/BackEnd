@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const usersSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
     {
         phone: {
             type: String,
@@ -13,6 +13,6 @@ const usersSchema = new mongoose.Schema(
     }
 );
 
-const Users = mongoose.model("Users", usersSchema, "users");
+const Users = mongoose.model("User", userSchema, "users");
 
-module.exports = Users;
+module.exports = User;
