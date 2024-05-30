@@ -2,7 +2,7 @@ const Accounts = require("../../models/account.model");
 const generateHelper = require("../../../../helpers/generate.helper");
 const md5 = require('md5');
 
-// [POST] /api/v1/admin/accounts/create
+// [POST] /api/v1/admin/account/create
 module.exports.createPost = async (req, res) => {
     try {
         const email = req.body.email;

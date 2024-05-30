@@ -1,4 +1,4 @@
-const Accounts = require("../../models/accounts.model");
+const Accounts = require("../../models/account.model");
 const md5 = require("md5");
 
 // [POST] /api/v1/admin/login
@@ -6,6 +6,9 @@ module.exports.loginPost = async (req, res) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
+
+        console.log(email);
+        console.log(password);
 
         const account = await Accounts.findOne({
             email: email,
