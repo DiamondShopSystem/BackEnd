@@ -1,7 +1,7 @@
 const accountRoutes = require("./account.route");
-const systemConfig = require("../../../../config/system");
+const categoryRoutes = require("./category.route");
 const authRoutes = require("./auth.route");
-
+const systemConfig = require("../../../../config/system");
 
 module.exports = (app) => {
 
@@ -12,5 +12,7 @@ module.exports = (app) => {
     app.use(version + `${PATH_ADMIN}` , authRoutes);
 
     app.use(version + `${PATH_ADMIN}/account` , accountRoutes);
+    
+    app.use(version + `${PATH_ADMIN}/category` ,categoryRoutes )
 
 }

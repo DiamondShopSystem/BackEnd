@@ -2,6 +2,24 @@ const Accounts = require("../../models/account.model");
 const generateHelper = require("../../../../helpers/generate.helper");
 const md5 = require('md5');
 
+
+// [GET] /api/v1/admin/account
+module.exports.getAccount = async (req, res) => {
+    try {
+        const record = await Accounts.find({
+            deleted: false
+        })
+        return res.status(200).json({
+            account: record,
+            msg: "Lấy danh sách tài khoản thành công"
+        });
+    } catch (error) {
+        return res.status(400).json({
+            msg: "Không thể lấy danh sách tài khoản"
+        })
+    }
+}
+
 // [POST] /api/v1/admin/account/create
 module.exports.createPost = async (req, res) => {
     try {

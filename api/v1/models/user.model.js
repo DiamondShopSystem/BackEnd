@@ -6,13 +6,19 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true,
+        },
+        status: String,
+        token: {
+            type: String,
+            unique: true
         }
     },
+
     {
         timestamps: true,
     }
 );
 
-const Users = mongoose.model("User", userSchema, "users");
+const Users = mongoose.model("Users", userSchema, "users");
 
-module.exports = User;
+module.exports = Users;
