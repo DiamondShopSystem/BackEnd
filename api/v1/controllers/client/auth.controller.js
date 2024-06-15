@@ -13,18 +13,16 @@ module.exports.loginPost = async (req, res) => {
         });
         console.log(user);
         if (!user) {
-            if (user.status != "active") {
-                return res.json({
-                    code: 403,
-                    msg: "Tài khoản đang bị khóa!"
-                });
-            }
+            // if (user.status != "active") {
+            //     return res.json({
+            //         code: 403,
+            //         msg: "Tài khoản đang bị khóa!"
+            //     });
+            // }
             req.body.token = generateHelper.generateRandomString(30);
             console.log(req.body);
             const record = new User(req.body);
             record.phone = phone;
-            record.status = "active";
-            record.deleted = "false";
             console.log(record);
             const data = await record.save();
             return res.json({
@@ -34,8 +32,8 @@ module.exports.loginPost = async (req, res) => {
             });
         } else {
             return res.json({
-                code: 205,
-                msg: "Đã có tài khoản!",
+                code: 200,
+                msg: "Đăng nhập thành công!",
             })
         }
 

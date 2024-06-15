@@ -1,8 +1,8 @@
-const Category = require("../../models/category.model");
+const Product = require("../../models/product.model");
 const createTreeHelper = require("../../../../helpers//create-tree.helper")
 const filterStateHelper = require("../../../../helpers/filter-state.helper");
-// [GET] /api/v1/admin/category
-module.exports.getCategory = async (req, res) => {
+// [GET] /api/v1/admin/product
+module.exports.getProduct = async (req, res) => {
     try {
         //Status Filter
         const filterState = filterStateHelper(req.query);
@@ -21,7 +21,7 @@ module.exports.getCategory = async (req, res) => {
             req.query.keyword = "";
         }
         //End Search
-        const records = await Category.find(find)
+        const records = await Product.find(find)
         return res.json({
             records: records,
             filterState: filterState,
@@ -37,7 +37,7 @@ module.exports.getCategory = async (req, res) => {
     }
 }
 
-// [GET] /api/v1/admin/category/create
+// [GET] /api/v1/admin/product/create
 module.exports.createGet = async (req, res) => {
     try {
         const find = {
@@ -60,10 +60,10 @@ module.exports.createGet = async (req, res) => {
         })
     }
 }
-// [POST] /api/v1/admin/category/create
-module.exports.createPost = async (req, res) => {
+// [POST] /api/v1/admin/product/create
+module.exports.createProduct = async (req, res) => {
     try {
-        const record = new Category(req.body);
+        const record = new Product(req.body);
         console.log(req.body)
         console.log(record);
         await record.save();
@@ -81,11 +81,11 @@ module.exports.createPost = async (req, res) => {
 };
 
 // [DELETE] /api/v1/admin/category/delete/:id
-module.exports.deleteCategory = async (req, res) => {
+module.exports.deleteProduct = async (req, res) => {
     try {
         const id = req.params.id;
         console.log(id);
-        await Category.updateOne({
+        await Product.updateOne({
             _id: id
         }, {
             deleted: true,
@@ -104,29 +104,29 @@ module.exports.deleteCategory = async (req, res) => {
 
 };
 
-// [GET] /api/v1/admin/category/detail/:id
-module.exports.detailCategory = async (req, res) => {
+// [GET] /api/v1/admin/product/detail/:id
+module.exports.detailProduct = async (req, res) => {
     try {
         console.log(req.params.id);
-        const data = await Category.findOne({
+        const data = await Product.findOne({
             _id: req.params.id,
             deleted: false
         });
-        if (data.parent_id === "") {
+        // if (data.parent_id === "") {
 
-        } else {
-            const parent = await Category.findOne({
-                _id: data.parent_id,
-                deleted: false
-            });
-            console.log(parent.title);
-            data.parentTitle = parent.title;
-        }
-        console.log(data);
+        // } else {
+        //     const parent = await Category.findOne({
+        //         _id: data.parent_id,
+        //         deleted: false
+        //     });
+        //     console.log(parent.title);
+        //     data.parentTitle = parent.title;
+        // }
+        // console.log(data);
 
         res.json({
             code: 200,
-            category: data,
+            data: data,
             msg: "Lấy thành công"
         });
     } catch (error) {
@@ -136,53 +136,3 @@ module.exports.detailCategory = async (req, res) => {
         });
     }
 };
-
-// [PATCH] /api/v1/admin/category/edit/:id
-module.exports.editPatchCategory = async (req, res) => {
-    try {
-        await Category.updateOne({
-            _id: req.params.id,
-            deleted: false
-        }, req.body);
-        return res.json({
-            code: 200,
-            msg: "Cập nhật thành công!"
-        })
-    } catch (error) {
-        return res.json({
-            code: 400,
-            msg: "Không thể cập nhật!"
-        })
-    }
-}
-
-// [GET] /api/v1/admin/category/edit/:id
-module.exports.editGetCategory = async (req, res) => {
-    try {
-        // console.log(req.params.id);
-        const data = await Category.findOne({
-            _id: req.params.id,
-            deleted: false
-        });
-
-        console.log(data._id);
-        const records = await Category.find({
-            deleted: false,
-        });
-        
-        let newRecords = createTreeHelper(records);
-        newRecords = newRecords.filter(item => item.slug != data.slug)
-        // console.log(updateNewRecords);
-        res.json({
-            code: 200,
-            category: data,
-            records: newRecords,
-            msg: "Lấy thành công"
-        });
-    } catch (error) {
-        res.json({
-            code: 400,
-            msg: "Lấy không thành công!"
-        });
-    }
-}

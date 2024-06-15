@@ -2,9 +2,11 @@ const express = require("express");
 require("dotenv").config();
 const database = require("./config/database");
 const cors = require("cors");
+const moment = require('moment');
 const bodyParser = require("body-parser");
 const routesAdminApiVer1 = require("./api/v1/routes/admin/index.route");
 const routesClientApiVer1 = require("./api/v1/routes/client/index.route");
+
 database.connect();
 
 const app = express();
@@ -12,6 +14,9 @@ const port = process.env.PORT;
 
 app.use(cors());
 
+
+// App Local Variables
+app.locals.moment = moment;
 
 // parse application/json
 app.use(bodyParser.json());

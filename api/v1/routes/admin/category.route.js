@@ -5,6 +5,8 @@ const controller = require("../../controllers/admin/category.controller");
 
 router.post("/create", controller.createPost);
 
+router.get("/create", controller.createGet);
+
 router.get("/" , controller.getCategory);
 
 router.get("/detail/:id" , controller.detailCategory );

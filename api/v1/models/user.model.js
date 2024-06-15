@@ -7,11 +7,18 @@ const userSchema = new mongoose.Schema(
             required: true,
             unique: true,
         },
-        status: String,
+        status:{
+            type: String,
+            default: "active"
+        },
         token: {
             type: String,
             unique: true
-        }
+        },
+        deleted: {
+            type:Boolean,
+            default:false
+        },
     },
 
     {
