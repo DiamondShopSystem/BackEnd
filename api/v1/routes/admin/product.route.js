@@ -8,7 +8,7 @@ const uploadCloud = require("../../middlewares/uploadCloud.middleware");
 router.get("/", controller.getProduct);
 
 router.post("/create",
-    upload.single("thumnail"),
+    upload.single("thumbnail"),
     uploadCloud.uploadSingle,
     controller.createProduct
 );

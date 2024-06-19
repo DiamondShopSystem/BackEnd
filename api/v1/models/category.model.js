@@ -23,7 +23,7 @@ const categorySchema = new mongoose.Schema({
         default: ""
     },
     description: String,
-    thumnail: {
+    thumbnail: {
         type:String,
         default: ""
     },

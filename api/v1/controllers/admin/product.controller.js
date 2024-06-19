@@ -1,6 +1,8 @@
 const Product = require("../../models/product.model");
-const createTreeHelper = require("../../../../helpers//create-tree.helper")
+const createTreeHelper = require("../../../../helpers//create-tree.helper");
 const filterStateHelper = require("../../../../helpers/filter-state.helper");
+const paginationHelper = require("../../../../helpers/pagination.helper");
+const cloudinary = require("../../../../helpers/cloudinary.helper");
 // [GET] /api/v1/admin/product
 module.exports.getProduct = async (req, res) => {
     try {
@@ -21,6 +23,12 @@ module.exports.getProduct = async (req, res) => {
             req.query.keyword = "";
         }
         //End Search
+
+        // Pagination
+        const countProducts = await Product.countDocuments(find);
+        const objectPagination = paginationHelper(4, req.query, countProducts);
+        // End Pagination
+
         const records = await Product.find(find)
         return res.json({
             records: records,
@@ -63,6 +71,12 @@ module.exports.createGet = async (req, res) => {
 // [POST] /api/v1/admin/product/create
 module.exports.createProduct = async (req, res) => {
     try {
+        // const {thumbnail} = req.body;
+        // cloudinary.uploader.upload(thumbnail,{
+        //     upload_preset: 'unsigned_upload',
+        //     public_id: `thumbnail`,
+        //     allowed_formats : ['png', 'jpg', 'jpeg', 'svg', 'ico', 'jfif', 'webp'],
+        // })
         const record = new Product(req.body);
         console.log(req.body)
         console.log(record);
@@ -71,11 +85,10 @@ module.exports.createProduct = async (req, res) => {
             code: 200,
             msg: "Tạo mới thành công"
         });
-
     } catch (error) {
         return res.json({
             code: 400,
-            msg: "Không thể tạo danh mục!"
+            msg: "Không thành công!"
         })
     }
 };

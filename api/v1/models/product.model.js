@@ -9,31 +9,31 @@ const productSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
-    slug:{
+    slug: {
         type: String,
-        slug:"title",
+        slug: "title",
         unique: true
     },
     description: String,
-    thumnail: String,
+    thumbnail: String,
     status: {
         type: String,
         default: "active",
     },
-    price:Number,
+    price: Number,
     size: Number,
     deleted: {
         type: Boolean,
         default: false
     },
-    thumnail: {
-        type:String,
+    thumbnail: {
+        type: String,
         default: ""
     },
     deletedAt: Date,
     price: Number,
     stock: Number,
-},{
+}, {
     timestamps: true
 });
 
