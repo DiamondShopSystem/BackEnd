@@ -19,4 +19,7 @@ router.get("/detail/:id", controller.detailProduct);
 
 router.get("/edit/:id", controller.editGetProduct);
 
+router.patch("/edit/:id" , 
+    controller.editPatchProduct);
+
 module.exports = router;

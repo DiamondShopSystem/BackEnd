@@ -5,44 +5,48 @@ require('dotenv').config();
 // [POST] /api/v1/admin/login
 module.exports.loginPost = async (req, res) => {
     try {
+        // Lấy email từ frontend 
         const email = req.body.email;
+        // Lấy password từ frontend 
         const password = req.body.password;
-
-        
+        //tìm trong data có account map với email và chưa bị xóa
         const account = await Accounts.findOne({
             email: email,
             deleted: false
         });
-        const accessToken = jwt.sign(email , process.env.ACCESS_TOKEN_SECRET);
-
+        // tạo accessToken
+        const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
+        // Kiểm tra có tài khoản hay chưa
         if (!account) {
             return res.json({
                 code: 401,
-                msg: error.message
+                msg: "Không thành công!"
             });
         }
+        // Kiểm tra mật khẩu
         if (md5(password) != account.password) {
             return res.json({
                 code: 402,
-                msg: error.message
+                msg: "Không thành công!"
             });
         }
+        // Kiểm tra trạng thái, nếu ko active tức bị khóa => ko cho xài
         if (account.status != "active") {
             return res.json({
                 code: 403,
-                msg: error.message
+                msg: "Không thành công!"
             });
         }
-        // const token = account.token;
+        // Thành công
         return res.json({
             code: 200,
             msg: "Đăng nhập thành công!",
-            accessToken: accessToken
+            token: accessToken
         })
     } catch (error) {
         return res.json({
             code: 400,
-            msg: error.message
+            msg: "Không thành công!"
         });
     }
 }

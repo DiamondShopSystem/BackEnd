@@ -180,3 +180,22 @@ module.exports.editGetProduct = async (req, res) => {
         });
     }
 }
+
+// [PATCH] /api/v1/admin/product/edit/:id
+module.exports.editPatchProduct = async (req, res) => {
+    try {
+        await Product.updateOne({
+            _id: req.params.id,
+            deleted: false
+        }, req.body);
+        return res.json({
+            code: 200,
+            msg: "Cập nhật thành công!"
+        })
+    } catch (error) {
+        return res.json({
+            code: 400,
+            msg: "Không thể cập nhật!"
+        })
+    }
+}

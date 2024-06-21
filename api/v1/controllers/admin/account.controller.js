@@ -1,7 +1,7 @@
 const Accounts = require("../../models/account.model");
 const generateHelper = require("../../../../helpers/generate.helper");
 const md5 = require('md5');
-
+const jwt = require("jsonwebtoken");
 
 // [GET] /api/v1/admin/account
 module.exports.getAccount = async (req, res) => {
@@ -34,16 +34,17 @@ module.exports.createPost = async (req, res) => {
                 msg: "Email đã tồn tại!"
             });
         } else {
-            req.body.token = generateHelper.generateRandomString(30);
+            // tạo accessToken
+            const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
             req.body.password = md5(req.body.password);
-
             const record = new Accounts(req.body);
             record.status = "active";
             const data = await record.save();
             return res.json({
                 code: 200,
                 msg: "Tạo tài khoản thành công",
-                token: data.token
+                account: record,
+                token: accessToken
             });
         }
 

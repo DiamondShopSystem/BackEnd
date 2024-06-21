@@ -137,25 +137,6 @@ module.exports.detailCategory = async (req, res) => {
     }
 };
 
-// [PATCH] /api/v1/admin/category/edit/:id
-module.exports.editPatchCategory = async (req, res) => {
-    try {
-        await Category.updateOne({
-            _id: req.params.id,
-            deleted: false
-        }, req.body);
-        return res.json({
-            code: 200,
-            msg: "Cập nhật thành công!"
-        })
-    } catch (error) {
-        return res.json({
-            code: 400,
-            msg: "Không thể cập nhật!"
-        })
-    }
-}
-
 // [GET] /api/v1/admin/category/edit/:id
 module.exports.editGetCategory = async (req, res) => {
     try {
@@ -186,3 +167,23 @@ module.exports.editGetCategory = async (req, res) => {
         });
     }
 }
+
+// [PATCH] /api/v1/admin/category/edit/:id
+module.exports.editPatchCategory = async (req, res) => {
+    try {
+        await Category.updateOne({
+            _id: req.params.id,
+            deleted: false
+        }, req.body);
+        return res.json({
+            code: 200,
+            msg: "Cập nhật thành công!"
+        })
+    } catch (error) {
+        return res.json({
+            code: 400,
+            msg: "Không thể cập nhật!"
+        })
+    }
+}
+
