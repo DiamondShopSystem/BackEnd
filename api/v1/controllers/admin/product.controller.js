@@ -93,7 +93,7 @@ module.exports.createProduct = async (req, res) => {
     }
 };
 
-// [DELETE] /api/v1/admin/category/delete/:id
+// [DELETE] /api/v1/admin/product/delete/:id
 module.exports.deleteProduct = async (req, res) => {
     try {
         const id = req.params.id;
@@ -149,3 +149,34 @@ module.exports.detailProduct = async (req, res) => {
         });
     }
 };
+
+// [GET] /api/v1/admin/product/edit/:id
+module.exports.editGetProduct = async (req, res) => {
+    try {
+        // console.log(req.params.id);
+        const data = await Product.findOne({
+            _id: req.params.id,
+            deleted: false
+        });
+
+        console.log(data._id);
+        const records = await Product.find({
+            deleted: false,
+        });
+
+        // let newRecords = createTreeHelper(records);
+        // newRecords = newRecords.filter(item => item.slug != data.slug)
+        // console.log(updateNewRecords);
+        res.json({
+            code: 200,
+            records: data,
+            // records: newRecords,
+            msg: "Lấy thành công"
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            msg: "Lấy không thành công!"
+        });
+    }
+}

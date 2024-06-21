@@ -22,7 +22,6 @@ const accountsSchema = new mongoose.Schema(
         phone: String,
         avatar: String,
         role_id: String,
-        token: String
     },
     {
         timestamps: true
