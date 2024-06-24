@@ -7,5 +7,9 @@ router.get("/" , controller.getAccount);
 
 router.post("/create" , controller.createPost);
 
+router.delete("/delete/:id",
+    controller.deleteAccount
+);
+
 
 module.exports = router;
