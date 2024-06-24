@@ -7,6 +7,8 @@ const uploadCloud = require("../../middlewares/admin/uploadCloud.middleware");
 
 router.get("/", controller.getProduct);
 
+router.get("/create", controller.createGet  )
+
 router.post("/create",
     upload.single("thumbnail"),
     uploadCloud.uploadSingle,
@@ -20,6 +22,8 @@ router.get("/detail/:id", controller.detailProduct);
 router.get("/edit/:id", controller.editGetProduct);
 
 router.patch("/edit/:id" , 
+    upload.single("thumbnail"),
+    uploadCloud.uploadSingle,
     controller.editPatchProduct);
 
 module.exports = router;

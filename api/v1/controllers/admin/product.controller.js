@@ -1,8 +1,8 @@
 const Product = require("../../models/product.model");
 const createTreeHelper = require("../../../../helpers//create-tree.helper");
 const filterStateHelper = require("../../../../helpers/filter-state.helper");
+const convertToSlugHelper = require("../../../../helpers/convert-to-slug.helper");
 const paginationHelper = require("../../../../helpers/pagination.helper");
-const cloudinary = require("../../../../helpers/cloudinary.helper");
 // [GET] /api/v1/admin/product
 module.exports.getProduct = async (req, res) => {
     try {
@@ -12,22 +12,42 @@ module.exports.getProduct = async (req, res) => {
         const find = {
             deleted: false,
         }
-        if (req.query.status) {
-            find.status = req.query.status;
-        }
-        //Search
-        if (req.query.keyword) {
-            const regex = new RegExp(req.query.keyword, "i");
-            find.title = regex;
-        } else {
-            req.query.keyword = "";
-        }
-        //End Search
-
         // Pagination
         const countProducts = await Product.countDocuments(find);
         const objectPagination = paginationHelper(4, req.query, countProducts);
         // End Pagination
+        if (req.query.status) {
+            find.status = req.query.status;
+        }
+        //Search
+        console.log(keyword);
+        if (keyword) {
+            const keywordRegex = new RegExp(keyword, "i");
+            const slug = convertToSlugHelper.convertToSlug(keyword);
+            const keywordSlugRegex = new RegExp(slug, "i");
+            //End Search
+            records = await Product.find({
+                $and: [
+                    {
+                        $or: [
+                            { title: keywordRegex },
+                            { slug: keywordSlugRegex }
+                        ]
+                    },
+                    find
+                ]
+            })
+                .limit(objectPagination.limitItems)
+                .skip(objectPagination.skip);
+
+        } else {
+            records = await Product.find(find)
+                .limit(objectPagination.limitItems)
+                .skip(objectPagination.skip);
+
+        }
+
+        
 
         const records = await Product.find(find)
         return res.json({
@@ -71,12 +91,6 @@ module.exports.createGet = async (req, res) => {
 // [POST] /api/v1/admin/product/create
 module.exports.createProduct = async (req, res) => {
     try {
-        // const {thumbnail} = req.body;
-        // cloudinary.uploader.upload(thumbnail,{
-        //     upload_preset: 'unsigned_upload',
-        //     public_id: `thumbnail`,
-        //     allowed_formats : ['png', 'jpg', 'jpeg', 'svg', 'ico', 'jfif', 'webp'],
-        // })
         const record = new Product(req.body);
         console.log(req.body)
         console.log(record);
@@ -121,22 +135,17 @@ module.exports.deleteProduct = async (req, res) => {
 module.exports.detailProduct = async (req, res) => {
     try {
         console.log(req.params.id);
-        const data = await Product.findOne({
+        let data = await Product.findOne({
             _id: req.params.id,
             deleted: false
         });
-        // if (data.parent_id === "") {
-
-        // } else {
-        //     const parent = await Category.findOne({
-        //         _id: data.parent_id,
-        //         deleted: false
-        //     });
-        //     console.log(parent.title);
-        //     data.parentTitle = parent.title;
-        // }
-        // console.log(data);
-
+        console.log(data);
+        const category = await Category.findOne({
+            _id: data.category,
+            deleted: false
+        });
+        data.categoryTitle = category.title;
+        console.log(data);
         res.json({
             code: 200,
             data: data,
@@ -158,7 +167,6 @@ module.exports.editGetProduct = async (req, res) => {
             _id: req.params.id,
             deleted: false
         });
-
         console.log(data._id);
         const records = await Product.find({
             deleted: false,
@@ -184,6 +192,8 @@ module.exports.editGetProduct = async (req, res) => {
 // [PATCH] /api/v1/admin/product/edit/:id
 module.exports.editPatchProduct = async (req, res) => {
     try {
+
+        console.log(req.body)
         await Product.updateOne({
             _id: req.params.id,
             deleted: false

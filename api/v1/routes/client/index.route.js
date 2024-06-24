@@ -1,5 +1,5 @@
 const authRoutes = require("./auth.route");
-
+const homeRoutes = require("./home.route");
 
 module.exports = (app) => {
 
@@ -8,5 +8,5 @@ module.exports = (app) => {
 
     app.use(version , authRoutes);
 
-
+    app.use(version, homeRoutes);
 }

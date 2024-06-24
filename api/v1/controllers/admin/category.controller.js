@@ -1,31 +1,61 @@
 const Category = require("../../models/category.model");
 const createTreeHelper = require("../../../../helpers//create-tree.helper")
 const filterStateHelper = require("../../../../helpers/filter-state.helper");
+const convertToSlugHelper = require("../../../../helpers/convert-to-slug.helper");
+const paginationHelper = require("../../../../helpers/pagination.helper");
 // [GET] /api/v1/admin/category
 module.exports.getCategory = async (req, res) => {
     try {
+        let records = [];
         //Status Filter
         const filterState = filterStateHelper(req.query);
         //End Status Filter
         const find = {
             deleted: false,
+
         }
+        // Pagination
+        const countProducts = await Category.countDocuments(find);
+        const objectPagination = paginationHelper(4, req.query, countProducts);
+        // End Pagination
+        const keyword = req.query.keyword;
         if (req.query.status) {
             find.status = req.query.status;
         }
         //Search
-        if (req.query.keyword) {
-            const regex = new RegExp(req.query.keyword, "i");
-            find.title = regex;
+        console.log(keyword);
+        if (keyword) {
+            const keywordRegex = new RegExp(keyword, "i");
+            const slug = convertToSlugHelper.convertToSlug(keyword);
+            const keywordSlugRegex = new RegExp(slug, "i");
+            //End Search
+            records = await Category.find({
+                $and: [
+                    {
+                        $or: [
+                            { title: keywordRegex },
+                            { slug: keywordSlugRegex }
+                        ]
+                    },
+                    find
+                ]
+            })
+                .limit(objectPagination.limitItems)
+                .skip(objectPagination.skip);
+
         } else {
-            req.query.keyword = "";
+            records = await Category.find(find)
+                .limit(objectPagination.limitItems)
+                .skip(objectPagination.skip);
         }
-        //End Search
-        const records = await Category.find(find)
+
+
         return res.json({
             records: records,
             filterState: filterState,
-            keyword: req.query.keyword,
+            keyword: keyword,
+            pagination: objectPagination,
+            find: find,
             code: 200,
             msg: "Thành công"
         });
@@ -148,11 +178,12 @@ module.exports.editGetCategory = async (req, res) => {
 
         console.log(data._id);
         const records = await Category.find({
-            deleted: false,
+            // deleted: false,
+            // deleted: true
         });
-        
+
         let newRecords = createTreeHelper(records);
-        newRecords = newRecords.filter(item => item.slug != data.slug)
+        // newRecords = newRecords.filter(item => item.slug != data.slug  )
         // console.log(updateNewRecords);
         res.json({
             code: 200,
@@ -171,6 +202,14 @@ module.exports.editGetCategory = async (req, res) => {
 // [PATCH] /api/v1/admin/category/edit/:id
 module.exports.editPatchCategory = async (req, res) => {
     try {
+        console.log(req.params.id);
+        console.log(req.body);
+        if (req.params.id === req.body.parent_id) {
+            return res.json({
+                code: 401,
+                msg: "Không thể cập nhật!"
+            })
+        }
         await Category.updateOne({
             _id: req.params.id,
             deleted: false

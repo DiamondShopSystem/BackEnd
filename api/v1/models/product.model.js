@@ -33,6 +33,11 @@ const productSchema = new mongoose.Schema({
     deletedAt: Date,
     price: Number,
     stock: Number,
+    isHighlight: Boolean,
+    categoryTitle: {
+        type: String,
+        default: ""
+    }
 }, {
     timestamps: true
 });
