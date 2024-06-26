@@ -25,7 +25,4 @@ router.get("/edit/:id",
 router.patch("/edit/:id" , 
     controller.editPatchCategory);
 
-
-
-
 module.exports = router;
