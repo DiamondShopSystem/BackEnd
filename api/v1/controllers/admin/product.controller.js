@@ -16,6 +16,7 @@ module.exports.getProduct = async (req, res) => {
         const countProducts = await Product.countDocuments(find);
         const objectPagination = paginationHelper(4, req.query, countProducts);
         // End Pagination
+        const keyword = req.query.keyword;
         if (req.query.status) {
             find.status = req.query.status;
         }
@@ -25,7 +26,7 @@ module.exports.getProduct = async (req, res) => {
             const keywordRegex = new RegExp(keyword, "i");
             const slug = convertToSlugHelper.convertToSlug(keyword);
             const keywordSlugRegex = new RegExp(slug, "i");
-            //End Search
+            // End Search
             records = await Product.find({
                 $and: [
                     {
@@ -42,18 +43,14 @@ module.exports.getProduct = async (req, res) => {
 
         } else {
             records = await Product.find(find)
-                .limit(objectPagination.limitItems)
-                .skip(objectPagination.skip);
-
+            .limit(objectPagination.limitItems)
+            .skip(objectPagination.skip);
         }
-
-        
-
-        const records = await Product.find(find)
         return res.json({
             records: records,
             filterState: filterState,
-            keyword: req.query.keyword,
+            keyword: keyword,
+            pagination: objectPagination,
             code: 200,
             msg: "Thành công"
         });

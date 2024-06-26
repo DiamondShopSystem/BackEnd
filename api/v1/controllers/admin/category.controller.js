@@ -49,7 +49,6 @@ module.exports.getCategory = async (req, res) => {
                 .skip(objectPagination.skip);
         }
 
-
         return res.json({
             records: records,
             filterState: filterState,

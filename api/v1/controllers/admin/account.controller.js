@@ -2,16 +2,59 @@ const Account = require("../../models/account.model");
 const generateHelper = require("../../../../helpers/generate.helper");
 const md5 = require('md5');
 const jwt = require("jsonwebtoken");
-
+const createTreeHelper = require("../../../../helpers//create-tree.helper")
+const filterStateHelper = require("../../../../helpers/filter-state.helper");
+const convertToSlugHelper = require("../../../../helpers/convert-to-slug.helper");
+const paginationHelper = require("../../../../helpers/pagination.helper");
 // [GET] /api/v1/admin/account
 module.exports.getAccount = async (req, res) => {
     try {
-        const record = await Account.find({
-            deleted: false
-        })
+        let records = [];
+        //Status Filter
+        const filterState = filterStateHelper(req.query);
+        //End Status Filter
+        const find = {
+            deleted: false,
+        }
+        // Pagination
+        const countProducts = await Account.countDocuments(find);
+        const objectPagination = paginationHelper(4, req.query, countProducts);
+        // End Pagination
+        const keyword = req.query.keyword;
+        if (req.query.status) {
+            find.status = req.query.status;
+        }
+        //Search
+        console.log(keyword);
+        if (keyword) {
+            const keywordRegex = new RegExp(keyword, "i");
+            const slug = convertToSlugHelper.convertToSlug(keyword);
+            const keywordSlugRegex = new RegExp(slug, "i");
+            //End Search
+            records = await Account.find({
+                $and: [
+                    {
+                        $or: [
+                            { title: keywordRegex },
+                            { slug: keywordSlugRegex }
+                        ]
+                    },
+                    find
+                ]
+            })
+                .limit(objectPagination.limitItems)
+                .skip(objectPagination.skip);
+
+        } else {
+            records = await Account.find(find)
+                .limit(objectPagination.limitItems)
+                .skip(objectPagination.skip);
+        }
         return res.status(200).json({
-            account: record,
-            msg: "Lấy danh sách tài khoản thành công"
+            account: records,
+            msg: "Lấy danh sách tài khoản thành công",
+            filterState: filterState,
+            pagination: objectPagination
         });
     } catch (error) {
         return res.status(400).json({
