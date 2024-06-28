@@ -33,7 +33,10 @@ const productSchema = new mongoose.Schema({
     deletedAt: Date,
     price: Number,
     stock: Number,
-    isHighlight: Boolean,
+    isHighlight: {
+        type: Boolean,
+        default: false
+    },
     categoryTitle: {
         type: String,
         default: ""

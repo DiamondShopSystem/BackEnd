@@ -1,4 +1,5 @@
 const Product = require("../../models/product.model");
+const Category = require("../../models/category.model");
 const createTreeHelper = require("../../../../helpers//create-tree.helper");
 const filterStateHelper = require("../../../../helpers/filter-state.helper");
 const convertToSlugHelper = require("../../../../helpers/convert-to-slug.helper");
@@ -68,9 +69,7 @@ module.exports.createGet = async (req, res) => {
         const find = {
             deleted: false,
         }
-
         const records = await Category.find(find);
-
         const newRecords = createTreeHelper(records);
         console.log(newRecords);
         return res.json({
