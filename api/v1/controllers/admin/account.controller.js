@@ -6,8 +6,8 @@ const createTreeHelper = require("../../../../helpers//create-tree.helper")
 const filterStateHelper = require("../../../../helpers/filter-state.helper");
 const convertToSlugHelper = require("../../../../helpers/convert-to-slug.helper");
 const paginationHelper = require("../../../../helpers/pagination.helper");
-// [GET] /api/v1/admin/account
-module.exports.getAccount = async (req, res) => {
+// [GET] /api/v1/admin/account/staff
+module.exports.getStaff = async (req, res) => {
     try {
         let records = [];
         //Status Filter
@@ -17,8 +17,8 @@ module.exports.getAccount = async (req, res) => {
             deleted: false,
         }
         // Pagination
-        const countProducts = await Account.countDocuments(find);
-        const objectPagination = paginationHelper(4, req.query, countProducts);
+        const countAccounts = await Account.countDocuments(find);
+        const objectPagination = paginationHelper(4, req.query, countAccounts);
         // End Pagination
         const keyword = req.query.keyword;
         if (req.query.status) {
@@ -28,15 +28,14 @@ module.exports.getAccount = async (req, res) => {
         console.log(keyword);
         if (keyword) {
             const keywordRegex = new RegExp(keyword, "i");
-            const slug = convertToSlugHelper.convertToSlug(keyword);
-            const keywordSlugRegex = new RegExp(slug, "i");
+            // console.log(keywordSlugRegex)
             //End Search
             records = await Account.find({
                 $and: [
                     {
                         $or: [
-                            { title: keywordRegex },
-                            { slug: keywordSlugRegex }
+                            { email: keywordRegex },
+                            { name: keywordRegex }
                         ]
                     },
                     find
@@ -50,21 +49,23 @@ module.exports.getAccount = async (req, res) => {
                 .limit(objectPagination.limitItems)
                 .skip(objectPagination.skip);
         }
-        return res.status(200).json({
+        return res.json({
+            code: 200,
             account: records,
             msg: "Lấy danh sách tài khoản thành công",
             filterState: filterState,
             pagination: objectPagination
         });
     } catch (error) {
-        return res.status(400).json({
+        return res.json({
+            code:400,
             msg: "Không thể lấy danh sách tài khoản"
         })
     }
 }
 
-// [POST] /api/v1/admin/account/create
-module.exports.createPost = async (req, res) => {
+// [POST] /api/v1/admin/account/staff/create
+module.exports.createStaff = async (req, res) => {
     try {
         const email = req.body.email;
         const account = await Account.findOne({
@@ -100,8 +101,8 @@ module.exports.createPost = async (req, res) => {
 
 };
 
-// [DELETE] /api/v1/admin/account/delete/:id
-module.exports.deleteAccount = async (req, res) => {
+// [DELETE] /api/v1/admin/account/staff/delete/:id
+module.exports.deleteStaff = async (req, res) => {
     try {
         const id = req.params.id;
         console.log(id);
@@ -125,8 +126,8 @@ module.exports.deleteAccount = async (req, res) => {
 };
 
 
-// [GET] /api/v1/admin/account/detail/:id
-module.exports.detailAccount = async (req, res) => {
+// [GET] /api/v1/admin/account/staff/detail/:id
+module.exports.detailStaff = async (req, res) => {
     try {
         console.log(req.params.id);
         const data = await Account.findOne({
@@ -147,8 +148,8 @@ module.exports.detailAccount = async (req, res) => {
     }
 };
 
-// [GET] /api/v1/admin/account/edit/:id
-module.exports.editAccount = async (req, res) => {
+// [GET] /api/v1/admin/account/staff/edit/:id
+module.exports.getEditStaff = async (req, res) => {
     try {
         console.log(req.params.id);
         const data = await Account.findOne({
@@ -169,8 +170,8 @@ module.exports.editAccount = async (req, res) => {
     }
 };
 
-// [PATCH] /api/v1/admin/account/edit/:id
-module.exports.editPatchAccount = async (req, res) => {
+// [PATCH] /api/v1/admin/account/staff/edit/:id
+module.exports.patchStaff = async (req, res) => {
     try {
         console.log(req.params.id);
         console.log(req.body);
