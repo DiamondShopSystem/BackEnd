@@ -11,8 +11,9 @@ const accountsSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        firstName: String,
-        lastName: String,
+        fullName:{
+            type: String
+        },
         status: String,
         deleted: {
             type:Boolean,

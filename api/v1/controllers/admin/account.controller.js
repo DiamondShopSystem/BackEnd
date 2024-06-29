@@ -1,4 +1,5 @@
 const Account = require("../../models/account.model");
+const User = require("../../models/user.model");
 const generateHelper = require("../../../../helpers/generate.helper");
 const md5 = require('md5');
 const jwt = require("jsonwebtoken");
@@ -35,7 +36,7 @@ module.exports.getStaff = async (req, res) => {
                     {
                         $or: [
                             { email: keywordRegex },
-                            { name: keywordRegex }
+                            { fullName: keywordRegex }
                         ]
                     },
                     find
@@ -58,7 +59,7 @@ module.exports.getStaff = async (req, res) => {
         });
     } catch (error) {
         return res.json({
-            code:400,
+            code: 400,
             msg: "Không thể lấy danh sách tài khoản"
         })
     }
@@ -72,6 +73,7 @@ module.exports.createStaff = async (req, res) => {
             email: email,
             deleted: false
         });
+        console.log(email);
         if (account) {
             return res.json({
                 code: 401,
@@ -83,7 +85,8 @@ module.exports.createStaff = async (req, res) => {
             req.body.password = md5(req.body.password);
             const record = new Account(req.body);
             record.status = "active";
-            const data = await record.save();
+            console.log(record);
+            await record.save();
             return res.json({
                 code: 200,
                 msg: "Tạo tài khoản thành công",
@@ -156,7 +159,7 @@ module.exports.getEditStaff = async (req, res) => {
             _id: req.params.id,
             deleted: false
         });
-        
+
         res.json({
             code: 200,
             category: data,
@@ -191,3 +194,99 @@ module.exports.patchStaff = async (req, res) => {
     }
 }
 
+// [GET] /api/v1/admin/account/user
+module.exports.getUser = async (req, res) => {
+    try {
+        let records = [];
+        //Status Filter
+        const filterState = filterStateHelper(req.query);
+        //End Status Filter
+        const find = {
+            deleted: false,
+        }
+        // Pagination
+        const countAccounts = await User.countDocuments(find);
+        const objectPagination = paginationHelper(4, req.query, countAccounts);
+        // End Pagination
+        const keyword = req.query.keyword;
+        if (req.query.status) {
+            find.status = req.query.status;
+        }
+        //Search
+        console.log(keyword);
+        if (keyword) {
+            const keywordRegex = new RegExp(keyword, "i");
+            // console.log(keywordSlugRegex)
+            //End Search
+            records = await User.find({
+                $and: [
+                    {
+                        $or: [
+                            { phone: keywordRegex },
+                            { fullName: keywordRegex }
+                        ]
+                    },
+                    find
+                ]
+            })
+                .limit(objectPagination.limitItems)
+                .skip(objectPagination.skip);
+
+        } else {
+            records = await User.find(find)
+                .limit(objectPagination.limitItems)
+                .skip(objectPagination.skip);
+        }
+        return res.json({
+            code: 200,
+            account: records,
+            msg: "Lấy danh sách tài khoản thành công",
+            filterState: filterState,
+            pagination: objectPagination
+        });
+    } catch (error) {
+        return res.json({
+            code: 400,
+            msg: "Không thể lấy danh sách tài khoản"
+        })
+    }
+}
+
+// [POST] /api/v1/admin/account/user/create
+module.exports.createUser = async (req, res) => {
+    try {
+        const phone = req.body.phone;
+        console.log(phone);
+        const user = await User.findOne({
+            phone: phone,
+            deleted: false
+        });
+        console.log(user);
+        if (user) {
+            return res.json({
+                code: 401,
+                msg: "Email đã tồn tại!"
+            });
+        } else {
+            // tạo accessToken
+            const accessToken = jwt.sign(phone, process.env.ACCESS_TOKEN_SECRET);
+            const record = new User(req.body);
+            console.log(record);
+            await record.save();
+
+            return res.json({
+                code: 200,
+                msg: "Tạo tài khoản thành công",
+                account: record,
+                token: accessToken
+            });
+        }
+
+    } catch (error) {
+        return res.json({
+            code: 400,
+            msg: "Không thể tạo tài khoản!"
+        })
+    }
+
+};
