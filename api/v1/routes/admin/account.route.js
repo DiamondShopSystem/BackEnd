@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const controller = require("../../controllers/admin/account.controller");
-
+//Staff
 router.get("/staff" , controller.getStaff);
 
 router.post("/staff/create" , controller.createStaff);
