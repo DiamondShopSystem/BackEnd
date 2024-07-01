@@ -140,7 +140,7 @@ module.exports.detailStaff = async (req, res) => {
 
         res.json({
             code: 200,
-            category: data,
+            record: data,
             msg: "Lấy thành công"
         });
     } catch (error) {
@@ -239,7 +239,7 @@ module.exports.getUser = async (req, res) => {
         }
         return res.json({
             code: 200,
-            account: records,
+            records: records,
             msg: "Lấy danh sách tài khoản thành công",
             filterState: filterState,
             pagination: objectPagination
@@ -326,7 +326,7 @@ module.exports.detailUser = async (req, res) => {
 
         res.json({
             code: 200,
-            user: data,
+            record: data,
             msg: "Lấy thành công"
         });
     } catch (error) {
@@ -348,7 +348,7 @@ module.exports.getEditUser = async (req, res) => {
 
         res.json({
             code: 200,
-            category: data,
+            record: data,
             msg: "Lấy thành công"
         });
     } catch (error) {

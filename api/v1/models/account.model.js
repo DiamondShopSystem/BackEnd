@@ -20,8 +20,14 @@ const accountsSchema = new mongoose.Schema(
             default:false
         },
         deletedAt: Date,
-        phone: String,
-        avatar: String,
+        phone: {
+            type: String,
+            default: ""
+        },
+        avatar: {
+            type:String,
+            default: ""
+        },
         role_id: String,
     },
     {
