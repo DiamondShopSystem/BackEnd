@@ -18,11 +18,11 @@ module.exports.loginPost = async (req, res) => {
         });
         console.log(account);
         // tạo accessToken
-        // const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
-        // res.cookie("token", accessToken, {
-        //     withCredentials: true,
-        //     httpOnly: false,
-        // });
+        const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
+        res.cookie("token", accessToken, {
+            withCredentials: true,
+            httpOnly: false,
+        });
         // Kiểm tra có tài khoản hay chưa
         if (!account) {
             return res.json({

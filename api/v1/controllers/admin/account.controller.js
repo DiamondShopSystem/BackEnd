@@ -162,7 +162,7 @@ module.exports.getEditStaff = async (req, res) => {
 
         res.json({
             code: 200,
-            category: data,
+            record: data,
             msg: "Lấy thành công"
         });
     } catch (error) {
