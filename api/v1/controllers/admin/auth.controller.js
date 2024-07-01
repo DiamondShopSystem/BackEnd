@@ -10,7 +10,7 @@ module.exports.loginPost = async (req, res) => {
         console.log(email)
         // Lấy password từ frontend 
         const password = req.body.password;
-        console.log(password)
+        console.log(password);
         //tìm trong data có account map với email và chưa bị xóa
         const account = await Account.findOne({
             email: email,
@@ -18,11 +18,11 @@ module.exports.loginPost = async (req, res) => {
         });
         console.log(account);
         // tạo accessToken
-        const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
-        res.cookie("token", accessToken, {
-            withCredentials: true,
-            httpOnly: false,
-        });
+        // const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
+        // res.cookie("token", accessToken, {
+        //     withCredentials: true,
+        //     httpOnly: false,
+        // });
         // Kiểm tra có tài khoản hay chưa
         if (!account) {
             return res.json({

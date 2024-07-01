@@ -290,3 +290,92 @@ module.exports.createUser = async (req, res) => {
     }
 
 };
+
+// [DELETE] /api/v1/admin/account/user/delete/:id
+module.exports.deleteUser = async (req, res) => {
+    try {
+        const id = req.params.id;
+        console.log(id);
+        await User.updateOne({
+            _id: id
+        }, {
+            deleted: true,
+            deletedAt: new Date()
+        });
+        return res.json({
+            code: 200,
+            msg: "Xóa thành công!"
+        })
+    } catch (error) {
+        return res.json({
+            code: 400,
+            msg: "Không thể xóa!"
+        })
+    }
+
+};
+
+// [GET] /api/v1/admin/account/user/detail/:id
+module.exports.detailUser = async (req, res) => {
+    try {
+        console.log(req.params.id);
+        const data = await User.findOne({
+            _id: req.params.id,
+            deleted: false
+        });
+
+        res.json({
+            code: 200,
+            user: data,
+            msg: "Lấy thành công"
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            msg: "Lấy không thành công!"
+        });
+    }
+};
+
+// [GET] /api/v1/admin/account/user/edit/:id
+module.exports.getEditUser = async (req, res) => {
+    try {
+        console.log(req.params.id);
+        const data = await User.findOne({
+            _id: req.params.id,
+            deleted: false
+        });
+
+        res.json({
+            code: 200,
+            category: data,
+            msg: "Lấy thành công"
+        });
+    } catch (error) {
+        res.json({
+            code: 400,
+            msg: "Lấy không thành công!"
+        });
+    }
+};
+
+// [PATCH] /api/v1/admin/account/user/edit/:id
+module.exports.patchUser = async (req, res) => {
+    try {
+        console.log(req.params.id);
+        console.log(req.body);
+        await User.updateOne({
+            _id: req.params.id,
+            deleted: false
+        }, req.body);
+        return res.json({
+            code: 200,
+            msg: "Cập nhật thành công!"
+        })
+    } catch (error) {
+        return res.json({
+            code: 400,
+            msg: "Không thể cập nhật!"
+        })
+    }
+}
