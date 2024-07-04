@@ -21,6 +21,17 @@ module.exports.getProduct = async (req, res) => {
         if (req.query.status) {
             find.status = req.query.status;
         }
+
+        // Sort
+        const sort = {};
+        if (req.query.sortKey && req.query.sortValue) {
+            sort[req.query.sortKey] = req.query.sortValue;
+        } else {
+            sort["position"] = "desc";
+        }
+        // End Sort
+
+
         //Search
         console.log(keyword);
         if (keyword) {
@@ -39,13 +50,15 @@ module.exports.getProduct = async (req, res) => {
                     find
                 ]
             })
+                .sort(sort)
                 .limit(objectPagination.limitItems)
                 .skip(objectPagination.skip);
 
         } else {
             records = await Product.find(find)
-            .limit(objectPagination.limitItems)
-            .skip(objectPagination.skip);
+                .sort(sort)
+                .limit(objectPagination.limitItems)
+                .skip(objectPagination.skip);
         }
         return res.json({
             records: records,
@@ -137,14 +150,13 @@ module.exports.detailProduct = async (req, res) => {
         });
         console.log(data);
         const category = await Category.findOne({
-            _id: data.category,
+            _id: data.category_id,
             deleted: false
         });
-        data.categoryTitle = category.title;
-        console.log(data);
         res.json({
             code: 200,
-            data: data,
+            record: data,
+            category: category,
             msg: "Lấy thành công"
         });
     } catch (error) {
@@ -164,17 +176,15 @@ module.exports.editGetProduct = async (req, res) => {
             deleted: false
         });
         console.log(data._id);
-        const records = await Product.find({
-            deleted: false,
+        const records = await Category.find({
+            
         });
 
-        // let newRecords = createTreeHelper(records);
-        // newRecords = newRecords.filter(item => item.slug != data.slug)
-        // console.log(updateNewRecords);
+        let newRecords = createTreeHelper(records);
         res.json({
             code: 200,
-            records: data,
-            // records: newRecords,
+            record: data,
+            records: newRecords,
             msg: "Lấy thành công"
         });
     } catch (error) {

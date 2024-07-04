@@ -4,8 +4,11 @@ mongoose.plugin(slug);
 
 
 const productSchema = new mongoose.Schema({
-    title: String,
-    category: {
+    title: {
+        type: String,
+        default: ""
+    },
+    category_id: {
         type: String,
         default: ""
     },
@@ -14,14 +17,38 @@ const productSchema = new mongoose.Schema({
         slug: "title",
         unique: true
     },
-    description: String,
-    thumbnail: String,
+    mainGemStone: {
+        type: String,
+        default: []
+    },
+    secondGemStone: {
+        type: String,
+        default: []
+    },
+    material: {
+        type: String,
+        default: []
+    },
+    size: {
+        type: Number,
+        default: []
+    },
+    description: {
+        type: String,
+        default: ""
+    },
+    thumbnail: {
+        type: String,
+        default: ""
+    },
     status: {
         type: String,
         default: "active",
     },
-    price: Number,
-    size: Number,
+    price: {
+        type: Number,
+        default: 1
+    },
     deleted: {
         type: Boolean,
         default: false
@@ -31,15 +58,10 @@ const productSchema = new mongoose.Schema({
         default: ""
     },
     deletedAt: Date,
-    price: Number,
     stock: Number,
     isHighlight: {
         type: Boolean,
         default: false
-    },
-    categoryTitle: {
-        type: String,
-        default: ""
     }
 }, {
     timestamps: true

@@ -35,9 +35,9 @@ module.exports.category = async (req, res) => {
         const allCagegoryId = allCagegory.map(item => item.id);
         console.log(allCagegoryId);
         const products = await Product.find({
-            category: {
+            category_id: {
                 $in: [
-                    category._id,
+                    category.id,
                     ...allCagegoryId
                 ]
             },

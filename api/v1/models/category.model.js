@@ -5,39 +5,40 @@ mongoose.plugin(slug);
 
 const categorySchema = new mongoose.Schema({
     title: String,
-    parent_id:{
+    parent_id: {
         type: String,
         default: "",
     },
-    slug:{
+    slug: {
         type: String,
-        slug:"title",
+        slug: "title",
         unique: true
     },
-    children:{
+    children: {
         type: Object,
         default: []
     },
-    parentTitle:{
-        type:String,
+    parentTitle: {
+        type: String,
         default: ""
     },
     description: String,
     thumbnail: {
-        type:String,
+        type: String,
         default: ""
     },
     status: {
         type: String,
         default: "active",
     },
+    position: Number,
     deleted: {
         type: Boolean,
         default: false
     },
     deletedAt: Date,
 
-},{
+}, {
     timestamps: true
 });
 

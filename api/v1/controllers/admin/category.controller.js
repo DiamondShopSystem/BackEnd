@@ -1,15 +1,18 @@
 const Category = require("../../models/category.model");
-const createTreeHelper = require("../../../../helpers//create-tree.helper")
+const createTreeHelper = require("../../../../helpers//create-tree.helper");
 const filterStateHelper = require("../../../../helpers/filter-state.helper");
 const convertToSlugHelper = require("../../../../helpers/convert-to-slug.helper");
 const paginationHelper = require("../../../../helpers/pagination.helper");
+
 // [GET] /api/v1/admin/category
 module.exports.getCategory = async (req, res) => {
     try {
-        let records = [];
         //Status Filter
         const filterState = filterStateHelper(req.query);
         //End Status Filter
+
+        let records = [];
+
         const find = {
             deleted: false,
 
@@ -22,6 +25,16 @@ module.exports.getCategory = async (req, res) => {
         if (req.query.status) {
             find.status = req.query.status;
         }
+
+        // Sort
+        const sort = {};
+        if (req.query.sortKey && req.query.sortValue) {
+            sort[req.query.sortKey] = req.query.sortValue;
+        } else {
+            sort["position"] = "desc";
+        }
+        // End Sort
+
         //Search
         console.log(keyword);
         if (keyword) {
@@ -40,11 +53,13 @@ module.exports.getCategory = async (req, res) => {
                     find
                 ]
             })
+                .sort(sort)
                 .limit(objectPagination.limitItems)
                 .skip(objectPagination.skip);
 
         } else {
             records = await Category.find(find)
+                .sort(sort)
                 .limit(objectPagination.limitItems)
                 .skip(objectPagination.skip);
         }
@@ -55,6 +70,7 @@ module.exports.getCategory = async (req, res) => {
             keyword: keyword,
             pagination: objectPagination,
             find: find,
+            sort: sort,
             code: 200,
             msg: "Thành công"
         });
@@ -92,8 +108,10 @@ module.exports.createGet = async (req, res) => {
 // [POST] /api/v1/admin/category/create
 module.exports.createPost = async (req, res) => {
     try {
+        const countRecords = await Category.countDocuments();
+        req.body.position = countRecords + 1;
+        console.log(req.body);
         const record = new Category(req.body);
-        console.log(req.body)
         console.log(record);
         await record.save();
         return res.json({
@@ -141,21 +159,20 @@ module.exports.detailCategory = async (req, res) => {
             _id: req.params.id,
             deleted: false
         });
+        // Kiểm tra có danh mục cha hay không
         if (data.parent_id === "") {
-
+            // Ko có thì ko làm gì cả
         } else {
+            // Nếu có tìm ra danh mục đó và dán Title Danh mục cha vào
             const parent = await Category.findOne({
                 _id: data.parent_id,
                 deleted: false
             });
-            console.log(parent.title);
             data.parentTitle = parent.title;
         }
-        console.log(data);
-
         res.json({
             code: 200,
-            category: data,
+            record: data,
             msg: "Lấy thành công"
         });
     } catch (error) {
@@ -169,24 +186,20 @@ module.exports.detailCategory = async (req, res) => {
 // [GET] /api/v1/admin/category/edit/:id
 module.exports.editGetCategory = async (req, res) => {
     try {
-        // console.log(req.params.id);
         const data = await Category.findOne({
             _id: req.params.id,
             deleted: false
         });
 
-        console.log(data._id);
         const records = await Category.find({
-            // deleted: false,
-            // deleted: true
+            
         });
 
         let newRecords = createTreeHelper(records);
-        // newRecords = newRecords.filter(item => item.slug != data.slug  )
-        // console.log(updateNewRecords);
+
         res.json({
             code: 200,
-            category: data,
+            record: data,
             records: newRecords,
             msg: "Lấy thành công"
         });
@@ -201,8 +214,6 @@ module.exports.editGetCategory = async (req, res) => {
 // [PATCH] /api/v1/admin/category/edit/:id
 module.exports.editPatchCategory = async (req, res) => {
     try {
-        console.log(req.params.id);
-        console.log(req.body);
         if (req.params.id === req.body.parent_id) {
             return res.json({
                 code: 401,
