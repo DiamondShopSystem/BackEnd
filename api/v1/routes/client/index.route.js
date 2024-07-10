@@ -1,6 +1,8 @@
 const authRoutes = require("./auth.route");
 const homeRoutes = require("./home.route");
 const productRoutes = require("./product.route");
+const cartRoutes = require("./cart.route");
+
 module.exports = (app) => {
 
     const version = "/api/v1";
@@ -10,6 +12,7 @@ module.exports = (app) => {
 
     app.use(version, homeRoutes);
 
-    app.use(version + "/products" , productRoutes);
+    app.use(version , productRoutes);
 
+    app.use(version + "/cart", cartRoutes);
 }

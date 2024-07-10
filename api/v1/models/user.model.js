@@ -2,25 +2,22 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
     {
-        phone: {
+        phoneNumber: {
             type: String,
             required: true,
             unique: true,
         },
-        status:{
+        status: {
             type: String,
             default: "active"
         },
-        token: {
-            type: String,
-            unique: true
-        },
         deleted: {
-            type:Boolean,
-            default:false
+            type: Boolean,
+            default: false
         },
         fullName: {
-            type: String
+            type: String,
+            default: ""
         }
     },
 
@@ -29,6 +26,6 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-const Users = mongoose.model("Users", userSchema, "users");
+const User = mongoose.model("User", userSchema, "user");
 
-module.exports = Users;
+module.exports = User;

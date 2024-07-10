@@ -62,3 +62,26 @@ module.exports.category = async (req, res) => {
         })
     }
 }
+
+// [GET] /products/detail/:id
+module.exports.productDetail = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const product = await Product.findOne({
+            _id: id,
+            deleted: false,
+            status: "active"
+        });
+
+        res.json({
+            code: 200,
+            msg: "Thành công",
+            record: product
+        })
+    } catch (error) {
+        res.json({
+            code: 400,
+            msg: "Không thành công"
+        })
+    }
+}

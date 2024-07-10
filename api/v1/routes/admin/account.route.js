@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
-
+const verifyJWT = require("../../middlewares/admin/verifyJWT");
 const controller = require("../../controllers/admin/account.controller");
+
+router.use(verifyJWT);
 
 //Staff
 router.get("/staff" , controller.getStaff);

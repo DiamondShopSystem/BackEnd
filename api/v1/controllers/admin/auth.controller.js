@@ -1,56 +1,51 @@
 const Account = require("../../models/account.model");
-const md5 = require("md5");
+// const md5 = require("md5");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 require('dotenv').config();
+
 // [POST] /api/v1/admin/login
-module.exports.loginPost = async (req, res) => {
+module.exports.login = async (req, res) => {
     try {
-        // Lấy email từ frontend 
         const email = req.body.email;
-        console.log(email)
-        // Lấy password từ frontend 
+        console.log(email);
         const password = req.body.password;
         console.log(password);
-        //tìm trong data có account map với email và chưa bị xóa
         const account = await Account.findOne({
             email: email,
             deleted: false
         });
         console.log(account);
-        // tạo accessToken
-        const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
-        res.cookie("token", accessToken, {
-            withCredentials: true,
-            httpOnly: false,
-        });
-        // Kiểm tra có tài khoản hay chưa
         if (!account) {
             return res.json({
                 code: 401,
                 msg: "Không thành công!"
             });
         }
-        // Kiểm tra mật khẩu
-        if (md5(password) != account.password) {
+        const checkPassword = await bcrypt.compare(password, account.password);
+        if (checkPassword && (account.status === "active")) {
+            const accessToken = jwt.sign(
+                { 'email': account.email },
+                process.env.ACCESS_TOKEN_SECRET,
+                { expiresIn: '30s' }
+            );
+            const refreshToken = jwt.sign(
+                { 'email': account.email },
+                process.env.REFRESH_TOKEN_SECRET,
+                { expiresIn: '1d' }
+            );
+            res.cookie('jwt', refreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 7 * 24 * 60 * 60 * 1000 });
             return res.json({
-                code: 402,
+                code: 200,
+                msg: "Đăng nhập thành công!",
+                accessToken: accessToken
+            })
+        } else {
+            return res.json({
+                code: 401,
                 msg: "Không thành công!"
             });
         }
-        // Kiểm tra trạng thái, nếu ko active tức bị khóa => ko cho xài
-        if (account.status != "active") {
-            return res.json({
-                code: 403,
-                msg: "Không thành công!"
-            });
-        }
-        
-        // Thành công
-        return res.json({
-            code: 200,
-            msg: "Đăng nhập thành công!",
-            token: accessToken
-        })
     } catch (error) {
         return res.json({
             code: 400,
@@ -58,3 +53,64 @@ module.exports.loginPost = async (req, res) => {
         });
     }
 }
+
+// [GET] /api/v1/admin/auth/refresh
+module.exports.refreshToken = async (req, res) => {
+    const cookies = req.cookies;
+    if (!cookies?.jwt) {
+        return res.sendStatus(401);
+    }
+    const refreshToken = cookies.jwt;
+
+    jwt.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET,
+        async (err, decoded) => {
+            if (err) {
+                return res.json({
+                    code: 403,
+                    msg: 'Không thể xác thực'
+                });
+            }
+            const account = await Account.findOne({ email: decoded.email });
+
+            if (!account) {
+                return res.json({
+                    code: 401,
+                    msg: "Không thể xác thực"
+                })
+            }
+            const accessToken = jwt.sign(
+                { 'email': account.email },
+                process.env.ACCESS_TOKEN_SECRET,
+                { expiresIn: '30s' }
+            );
+
+            res.json({
+                code: 200,
+                accessToken: accessToken
+            });
+        })
+
+}
+
+// [GET] /api/v1/admin/logout
+module.exports.logout = async (req, res) => {
+    const cookies = req.cookies;
+    if (!cookies?.jwt) {
+        return res.sendStatus(204);
+    }
+    const refreshToken = cookies.jwt;
+    const account = await Account.findOne({
+        refreshToken: refreshToken
+    })
+    if (!account) {
+        res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
+    }
+
+    res.json({
+        code: 200,
+        msg: "Đã xóa Cookie"
+    });
+}
+

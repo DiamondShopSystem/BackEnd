@@ -1,7 +1,8 @@
 const Account = require("../../models/account.model");
 const User = require("../../models/user.model");
 const generateHelper = require("../../../../helpers/generate.helper");
-const md5 = require('md5');
+// const md5 = require('md5');
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const createTreeHelper = require("../../../../helpers//create-tree.helper")
 const filterStateHelper = require("../../../../helpers/filter-state.helper");
@@ -81,8 +82,9 @@ module.exports.createStaff = async (req, res) => {
             });
         } else {
             // tạo accessToken
-            const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
-            req.body.password = md5(req.body.password);
+            // const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
+            const hashedPWd = await bcrypt.hash(req.body.password, 10);
+            req.body.password = hashedPWd;
             const record = new Account(req.body);
             record.status = "active";
             console.log(record);
@@ -91,7 +93,7 @@ module.exports.createStaff = async (req, res) => {
                 code: 200,
                 msg: "Tạo tài khoản thành công",
                 account: record,
-                token: accessToken
+                // token: accessToken
             });
         }
 

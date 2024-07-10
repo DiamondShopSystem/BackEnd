@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const authenticateToken = require("../../middlewares/admin/authenticateToken.middleware");
+
 const controller = require("../../controllers/admin/category.controller");
 
 router.post("/create", 
@@ -10,7 +10,7 @@ router.get("/create",
     controller.createGet);
 
 router.get("/" , 
-    // authenticateToken.authenticateToken, 
+
     controller.getCategory);
 
 router.get("/detail/:id" , 

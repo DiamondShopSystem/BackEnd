@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const controller = require("../../controllers/client/product.controller");
 
 
@@ -7,8 +8,8 @@ const controller = require("../../controllers/client/product.controller");
 
 // router.get("/:slug", controller.detail);
 
-router.get("/:slugCategory", controller.category);
+router.get("/products/:slugCategory", controller.category);
 
-// router.get("/detail/:slugProduct", controller.detail);
+router.get("/:id", controller.productDetail);
 
 module.exports = router;

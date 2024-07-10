@@ -12,7 +12,7 @@ database.connect();
 const app = express();
 const port = process.env.PORT;
 
-app.use(cors());
+app.use(cors({ credentials: true ,  origin: 'http://localhost:3000'}));
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -20,7 +20,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // app.use(express.urlencoded({limit: '50mb'}));
 // App Local Variables
 app.locals.moment = moment;
-
 
 app.use(cookieParser());
 // parse application/json

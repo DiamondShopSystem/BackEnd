@@ -18,19 +18,19 @@ const productSchema = new mongoose.Schema({
         unique: true
     },
     mainGemStone: {
-        type: String,
+        type: Array,
         default: []
     },
     secondGemStone: {
-        type: String,
+        type: Array,
         default: []
     },
     material: {
-        type: String,
+        type: Array,
         default: []
     },
     size: {
-        type: Number,
+        type: Array,
         default: []
     },
     description: {

@@ -2,7 +2,7 @@ const Category = require("../../models/category.model");
 const createTreeHelper = require("../../../../helpers/create-tree.helper");
 const Product = require("../../models/product.model");
 // [GET] api/v1/
-module.exports.getHome = async (req, res) => {
+module.exports.index = async (req, res) => {
     try {
         // Sản phẩm nổi bật
         const popularProducts = await Product.find({
