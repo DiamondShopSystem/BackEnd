@@ -4,7 +4,7 @@ const verifyJWT = require("../../middlewares/client/verifyJWT");
 const controller = require("../../controllers/client/cart.controller");
 
 
-router.use(verifyJWT);
+// router.use(verifyJWT);
 
 router.get("/get", controller.index);
 

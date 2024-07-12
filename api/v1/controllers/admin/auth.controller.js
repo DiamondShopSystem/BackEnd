@@ -35,6 +35,7 @@ module.exports.login = async (req, res) => {
                 { expiresIn: '1d' }
             );
             res.cookie('jwt', refreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 7 * 24 * 60 * 60 * 1000 });
+            res.cookie('email', email, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 7 * 24 * 60 * 60 * 1000 })
             return res.json({
                 code: 200,
                 msg: "Đăng nhập thành công!",

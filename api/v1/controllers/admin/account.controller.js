@@ -11,6 +11,7 @@ const paginationHelper = require("../../../../helpers/pagination.helper");
 // [GET] /api/v1/admin/account/staff
 module.exports.getStaff = async (req, res) => {
     try {
+        let total = [];
         let records = [];
         //Status Filter
         const filterState = filterStateHelper(req.query);
@@ -32,6 +33,7 @@ module.exports.getStaff = async (req, res) => {
             const keywordRegex = new RegExp(keyword, "i");
             // console.log(keywordSlugRegex)
             //End Search
+            total = await Account.find(find);
             records = await Account.find({
                 $and: [
                     {
@@ -47,13 +49,20 @@ module.exports.getStaff = async (req, res) => {
                 .skip(objectPagination.skip);
 
         } else {
+            total = await Account.find(find);
             records = await Account.find(find)
                 .limit(objectPagination.limitItems)
                 .skip(objectPagination.skip);
         }
+        console.log(total);
+        let counter = 0;
+        for (let i = 0; i < total.length; i++) {
+            counter++;
+        }
         return res.json({
             code: 200,
             account: records,
+            total: counter,
             msg: "Lấy danh sách tài khoản thành công",
             filterState: filterState,
             pagination: objectPagination
@@ -81,8 +90,6 @@ module.exports.createStaff = async (req, res) => {
                 msg: "Email đã tồn tại!"
             });
         } else {
-            // tạo accessToken
-            // const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET);
             const hashedPWd = await bcrypt.hash(req.body.password, 10);
             req.body.password = hashedPWd;
             const record = new Account(req.body);
@@ -93,7 +100,6 @@ module.exports.createStaff = async (req, res) => {
                 code: 200,
                 msg: "Tạo tài khoản thành công",
                 account: record,
-                // token: accessToken
             });
         }
 

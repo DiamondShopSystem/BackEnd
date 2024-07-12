@@ -7,6 +7,7 @@ const paginationHelper = require("../../../../helpers/pagination.helper");
 // [GET] /api/v1/admin/category
 module.exports.getCategory = async (req, res) => {
     try {
+        let total = [];
         //Status Filter
         const filterState = filterStateHelper(req.query);
         //End Status Filter
@@ -42,6 +43,7 @@ module.exports.getCategory = async (req, res) => {
             const slug = convertToSlugHelper.convertToSlug(keyword);
             const keywordSlugRegex = new RegExp(slug, "i");
             //End Search
+            total = await Category.find(find);
             records = await Category.find({
                 $and: [
                     {
@@ -58,16 +60,22 @@ module.exports.getCategory = async (req, res) => {
                 .skip(objectPagination.skip);
 
         } else {
+            total = await Category.find(find);
             records = await Category.find(find)
                 .sort(sort)
                 .limit(objectPagination.limitItems)
                 .skip(objectPagination.skip);
         }
-
+        console.log(total);
+        let counter = 0;
+        for (let i = 0; i < total.length; i++) {
+            counter++;
+        }
         return res.json({
             records: records,
             filterState: filterState,
             keyword: keyword,
+            total: counter,
             pagination: objectPagination,
             find: find,
             sort: sort,
@@ -192,7 +200,7 @@ module.exports.editGetCategory = async (req, res) => {
         });
 
         const records = await Category.find({
-            
+
         });
 
         let newRecords = createTreeHelper(records);

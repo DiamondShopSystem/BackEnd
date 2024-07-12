@@ -2,13 +2,18 @@ const express = require("express");
 const router = express.Router();
 const verifyJWT = require("../../middlewares/admin/verifyJWT");
 const controller = require("../../controllers/admin/account.controller");
-
-router.use(verifyJWT);
+const multer = require("multer");
+const upload = multer();
+const uploadCloud = require("../../middlewares/admin/uploadCloud.middleware");
+// router.use(verifyJWT);
 
 //Staff
-router.get("/staff" , controller.getStaff);
+router.get("/staff", controller.getStaff);
 
-router.post("/staff/create" , controller.createStaff);
+router.post("/staff/create",
+    upload.single("avatar"),
+    uploadCloud.uploadSingle,
+    controller.createStaff);
 
 router.get("/staff/detail/:id", controller.detailStaff)
 
@@ -23,7 +28,7 @@ router.delete("/staff/delete/:id",
 //User
 router.get("/user", controller.getUser);
 
-router.post("/user/create" , controller.createUser);
+router.post("/user/create", controller.createUser);
 
 router.get("/user/detail/:id", controller.detailUser);
 

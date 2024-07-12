@@ -7,7 +7,9 @@ const paginationHelper = require("../../../../helpers/pagination.helper");
 // [GET] /api/v1/admin/product
 module.exports.getProduct = async (req, res) => {
     try {
+        let total = [];
         //Status Filter
+        
         const filterState = filterStateHelper(req.query);
         //End Status Filter
         const find = {
@@ -39,6 +41,7 @@ module.exports.getProduct = async (req, res) => {
             const slug = convertToSlugHelper.convertToSlug(keyword);
             const keywordSlugRegex = new RegExp(slug, "i");
             // End Search
+            total = await Product.find(find);
             records = await Product.find({
                 $and: [
                     {
@@ -55,15 +58,21 @@ module.exports.getProduct = async (req, res) => {
                 .skip(objectPagination.skip);
 
         } else {
+            total = await Product.find(find);
             records = await Product.find(find)
                 .sort(sort)
                 .limit(objectPagination.limitItems)
                 .skip(objectPagination.skip);
         }
+        let counter = 0;
+        for (let i = 0; i < total.length; i++) {
+            counter++;
+        }
         return res.json({
             records: records,
             filterState: filterState,
             keyword: keyword,
+            total: counter,
             pagination: objectPagination,
             code: 200,
             msg: "Thành công"
