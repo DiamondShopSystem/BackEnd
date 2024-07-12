@@ -6,48 +6,35 @@ require('dotenv').config();
 // [POST] /api/v1/login/verify/otp
 module.exports.login = async (req, res) => {
     try {
+        const phoneNumber = req.body.phoneNumber;
+
         const user = await User.findOne({
-            phoneNumber: req.body.phoneNumber,
+            phoneNumber: phoneNumber,
             deleted: false,
         });
+        const accessToken = jwt.sign(
+            { 'phoneNumber': phoneNumber },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '3600s' }
+        );
+        const refreshToken = jwt.sign(
+            { 'phoneNumber': phoneNumber },
+            process.env.REFRESH_TOKEN_SECRET,
+            { expiresIn: '1d' }
+        );
         if (!user) {
             const record = new User(req.body);
             await record.save();
-            const accessToken = jwt.sign(
-                { 'phoneNumber': record.phoneNumber },
-                process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '3600s' }
-            );
-            const refreshToken = jwt.sign(
-                { 'phoneNumber': record.phoneNumber },
-                process.env.REFRESH_TOKEN_SECRET,
-                { expiresIn: '1d' }
-            );
-            const cart = new Cart({
-                user_id: record._id
-            })
-            await cart.save();
+
             res.cookie('jwt', refreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 7 * 24 * 60 * 60 * 1000 });
             res.cookie("user", user, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 7 * 24 * 60 * 60 * 1000 });
             return res.json({
                 record: record,
-                cart: cart,
+                accessToken: accessToken,
                 code: 200,
-                msg: "Tạo tài khoản thành công!",
-                accessToken: accessToken
+                msg: "Tạo tài khoản thành công!"
             });
         } else {
-            const accessToken = jwt.sign(
-                { 'phoneNumber': user.phoneNumber },
-                process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '3600s' }
-            );
-            const refreshToken = jwt.sign(
-                { 'phoneNumber': user.phoneNumber },
-                process.env.REFRESH_TOKEN_SECRET,
-                { expiresIn: '1d' }
-            );
-            
             res.cookie('jwt', refreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 7 * 24 * 60 * 60 * 1000 });
             res.cookie("user", user, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 7 * 24 * 60 * 60 * 1000 });
             return res.json({
@@ -118,6 +105,7 @@ module.exports.logout = async (req, res) => {
     })
     if (!account) {
         res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
+        res.clearCookie('user', { httpOnly: true, sameSite: 'None', secure: true });
     }
 
     res.json({

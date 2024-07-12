@@ -28,7 +28,7 @@ const accountsSchema = new mongoose.Schema(
             type:String,
             default: ""
         },
-        role_id: String,
+        role: String,
     },
     {
         timestamps: true

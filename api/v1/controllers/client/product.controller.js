@@ -63,7 +63,7 @@ module.exports.category = async (req, res) => {
     }
 }
 
-// [GET] /products/detail/:id
+// [GET] /:id
 module.exports.productDetail = async (req, res) => {
     try {
         const id = req.params.id;
