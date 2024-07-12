@@ -86,7 +86,6 @@ module.exports.addPost = async (req, res) => {
             const objectCart = {
                 product_id: productId,
                 quantity: quantity,
-                size: size
             };
 
             await Cart.updateOne(
