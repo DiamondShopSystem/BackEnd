@@ -19,15 +19,16 @@ module.exports.index = async (req, res) => {
                     });
                     console.log(item.product_id)
                     item.productInfo = product;
-                    item.totalPrice = item.quantity * product.price;
+                    console.log(item.quantity)
+                    console.log(product.price)
+                    const totalPrice = item.quantity * product.price;
                     // db.cart.update({},
                     //     { $set: { "productInfo": product } },
                     //     {
                     //         upsert: false,
                     //         multi: true
                     //     });
-                    cart.totalPrice += item.totalPrice;
-
+                    cart.totalPrice += totalPrice;
                 }
             }
             return res.json({
@@ -85,6 +86,7 @@ module.exports.addPost = async (req, res) => {
             const objectCart = {
                 product_id: productId,
                 quantity: quantity,
+                size: size
             };
 
             await Cart.updateOne(

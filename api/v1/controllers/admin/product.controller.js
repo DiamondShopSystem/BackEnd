@@ -41,7 +41,17 @@ module.exports.getProduct = async (req, res) => {
             const slug = convertToSlugHelper.convertToSlug(keyword);
             const keywordSlugRegex = new RegExp(slug, "i");
             // End Search
-            total = await Product.find(find);
+            total = await Product.find({
+                $and: [
+                    {
+                        $or: [
+                            { title: keywordRegex },
+                            { slug: keywordSlugRegex }
+                        ]
+                    },
+                    find
+                ]
+            });
             records = await Product.find({
                 $and: [
                     {

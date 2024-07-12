@@ -43,7 +43,17 @@ module.exports.getCategory = async (req, res) => {
             const slug = convertToSlugHelper.convertToSlug(keyword);
             const keywordSlugRegex = new RegExp(slug, "i");
             //End Search
-            total = await Category.find(find);
+            total = await Category.find({
+                $and: [
+                    {
+                        $or: [
+                            { title: keywordRegex },
+                            { slug: keywordSlugRegex }
+                        ]
+                    },
+                    find
+                ]
+            });
             records = await Category.find({
                 $and: [
                     {

@@ -26,17 +26,17 @@ router.delete("/staff/delete/:id",
 );
 
 //User
-router.get("/user", controller.getUser);
+router.get("/customer", controller.getUser);
 
-router.post("/user/create", controller.createUser);
+router.post("/customer/create", controller.createUser);
 
-router.get("/user/detail/:id", controller.detailUser);
+router.get("/customer/detail/:id", controller.detailUser);
 
-router.get("/user/edit/:id", controller.getEditUser);
+router.get("/customer/edit/:id", controller.getEditUser);
 
-router.patch("/user/edit/:id", controller.patchUser);
+router.patch("/customer/edit/:id", controller.patchUser);
 
-router.delete("/user/delete/:id",
+router.delete("/customer/delete/:id",
     controller.deleteUser
 );
 

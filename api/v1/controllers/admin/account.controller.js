@@ -33,7 +33,17 @@ module.exports.getStaff = async (req, res) => {
             const keywordRegex = new RegExp(keyword, "i");
             // console.log(keywordSlugRegex)
             //End Search
-            total = await Account.find(find);
+            total = await Account.find({
+                $and: [
+                    {
+                        $or: [
+                            { email: keywordRegex },
+                            { fullName: keywordRegex }
+                        ]
+                    },
+                    find
+                ]
+            });
             records = await Account.find({
                 $and: [
                     {
@@ -202,9 +212,10 @@ module.exports.patchStaff = async (req, res) => {
     }
 }
 
-// [GET] /api/v1/admin/account/user
+// [GET] /api/v1/admin/account/customer
 module.exports.getUser = async (req, res) => {
     try {
+        let total = [];
         let records = [];
         //Status Filter
         const filterState = filterStateHelper(req.query);
@@ -226,11 +237,22 @@ module.exports.getUser = async (req, res) => {
             const keywordRegex = new RegExp(keyword, "i");
             // console.log(keywordSlugRegex)
             //End Search
+            total = await User.find({
+                $and: [
+                    {
+                        $or: [
+                            { phoneNumber: keywordRegex },
+                            { fullName: keywordRegex }
+                        ]
+                    },
+                    find
+                ]
+            });
             records = await User.find({
                 $and: [
                     {
                         $or: [
-                            { phone: keywordRegex },
+                            { phoneNumber: keywordRegex },
                             { fullName: keywordRegex }
                         ]
                     },
@@ -241,13 +263,20 @@ module.exports.getUser = async (req, res) => {
                 .skip(objectPagination.skip);
 
         } else {
+            total = await User.find(find);
             records = await User.find(find)
                 .limit(objectPagination.limitItems)
                 .skip(objectPagination.skip);
         }
+        console.log(total);
+        let counter = 0;
+        for (let i = 0; i < total.length; i++) {
+            counter++;
+        }
         return res.json({
             code: 200,
             records: records,
+            total: counter,
             msg: "Lấy danh sách tài khoản thành công",
             filterState: filterState,
             pagination: objectPagination
