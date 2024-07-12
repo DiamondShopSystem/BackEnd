@@ -11,7 +11,7 @@ const cartSchema = new mongoose.Schema(
             },
         ],
         totalPrice: Number,
-        
+        size: Number
     },
     {
         timestamps: true,

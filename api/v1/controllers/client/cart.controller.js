@@ -60,6 +60,7 @@ module.exports.index = async (req, res) => {
 // [POST] /cart/add/:productId
 module.exports.addPost = async (req, res) => {
     try {
+        const size = req.body.selectedSize;
         const productId = req.params.productId;
         const quantity = 1;
         const cart = await Cart.findOne({
@@ -92,6 +93,7 @@ module.exports.addPost = async (req, res) => {
                 { user_id: "6691057efbb258c025f7fa5a" },
                 {
                     $push: { products: objectCart },
+                    $push: { size: size },
                 }
             );
         }
