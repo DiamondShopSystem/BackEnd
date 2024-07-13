@@ -10,18 +10,17 @@ module.exports.index = async (req, res) => {
             user_id: "6691057efbb258c025f7fa5a"
         });
         cart.totalPrice = 0;
-        console.log(cart);
         if (cart) {
             if (cart.products.length > 0) {
-                for (const item of cart.products) {
+                for (let [index, item] of cart.products.entries()) {
                     const product = await Product.find({
                         _id: item.product_id
                     });
-                    console.log(item.product_id)
+                    console.log(index, item);
                     item.productInfo = product;
-                    console.log(item.quantity)
-                    console.log(product.price)
-                    const totalPrice = item.quantity * product.price;
+                    let quantity = item.quantity;
+                    let price = product[0].price;
+                    const totalPrice = quantity * price;
                     // db.cart.update({},
                     //     { $set: { "productInfo": product } },
                     //     {
@@ -60,15 +59,16 @@ module.exports.index = async (req, res) => {
 // [POST] /cart/add/:productId
 module.exports.addPost = async (req, res) => {
     try {
+        console.log(req.body);
+        const productId = req.body.id;
         const size = req.body.selectedSize;
-        const productId = req.params.productId;
         const quantity = 1;
         const cart = await Cart.findOne({
             user_id: "6691057efbb258c025f7fa5a"
         });
         console.log(cart);
         const product = await Product.findOne({
-            _id: req.params.productId
+            _id: productId
         });
         console.log(product)
         const existProductInCart = cart.products.find(item => item.product_id == productId);
@@ -83,17 +83,16 @@ module.exports.addPost = async (req, res) => {
                 $set: { "products.$.quantity": quantityNew }
             });
         } else {
-            console.log("Hi")
             const objectCart = {
                 product_id: productId,
                 quantity: quantity,
+                size: size
             };
 
             await Cart.updateOne(
                 { user_id: "6691057efbb258c025f7fa5a" },
                 {
                     $push: { products: objectCart },
-                    $push: { size: size },
                 }
             );
         }
@@ -136,3 +135,25 @@ module.exports.addPost = async (req, res) => {
         })
     }
 };
+
+// [DELETE] /cart/delete/:productId
+module.exports.deleteItem = async (req, res) => {
+    try {
+        const productId = req.params.productId;
+        console.log(productId);
+        await Cart.updateMany({
+            user_id: "6691057efbb258c025f7fa5a",
+        }, {
+            $pull: { products: { product_id: productId } }
+        })
+        res.json({
+            code: 200,
+            msg: "Thành công"
+        })
+    } catch (error) {
+        res.json({
+            code: 400,
+            msg: "Thất bại"
+        })
+    }
+}
