@@ -25,6 +25,8 @@ module.exports.patchInfo = async (req, res) => {
         const user = await User.findOne({
             _id: userId
         });
+        console.log(userId);
+        console.log(req.body);
         await User.updateOne({
             _id: user._id,
             deleted: false

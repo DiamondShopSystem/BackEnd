@@ -15,6 +15,10 @@ const orderSchema = new mongoose.Schema(
         phoneNumber: String,
         address: String,
         totalPrice: Number,
+        deleted: {
+            type: Boolean,
+            default: false
+        },
     },
     {
         timestamps: true
