@@ -1,13 +1,15 @@
 const Cart = require("../../models/cart.model");
 const Product = require("../../models/product.model");
 const User = require("../../models/user.model");
+
 // [GET] /cart/get
 module.exports.index = async (req, res) => {
     try {
         let records = [];
-        // const user = req.cookies.user;
+        const userId = req.cookies.user;
+        console.log(userId);
         const cart = await Cart.findOne({
-            user_id: "6691057efbb258c025f7fa5a"
+            user_id: userId
         });
         cart.totalPrice = 0;
         if (cart) {
@@ -16,7 +18,6 @@ module.exports.index = async (req, res) => {
                     const product = await Product.find({
                         _id: item.product_id
                     });
-                    console.log(index, item);
                     item.productInfo = product;
                     let quantity = item.quantity;
                     let price = product[0].price;
@@ -38,7 +39,7 @@ module.exports.index = async (req, res) => {
             })
         } else {
             const newCart = new Cart({
-                user_id: "6691057efbb258c025f7fa5a",
+                user_id: userId
             })
             await newCart.save();
             return res.json({
@@ -56,15 +57,16 @@ module.exports.index = async (req, res) => {
     }
 };
 
-// [POST] /cart/add/:productId
+// [POST] /cart/add/
 module.exports.addPost = async (req, res) => {
     try {
-        console.log(req.body);
+        console.log(req.cookies.user);
+        const userId = req.cookies.user;
         const productId = req.body.id;
         const size = req.body.selectedSize;
         const quantity = 1;
         const cart = await Cart.findOne({
-            user_id: "6691057efbb258c025f7fa5a"
+            user_id: userId
         });
         console.log(cart);
         const product = await Product.findOne({
@@ -77,7 +79,7 @@ module.exports.addPost = async (req, res) => {
             const quantityNew = existProductInCart.quantity + quantity;
 
             await Cart.updateOne({
-                user_id: "6691057efbb258c025f7fa5a",
+                user_id: userId,
                 "products.product_id": productId
             }, {
                 $set: { "products.$.quantity": quantityNew }
@@ -90,7 +92,7 @@ module.exports.addPost = async (req, res) => {
             };
 
             await Cart.updateOne(
-                { user_id: "6691057efbb258c025f7fa5a" },
+                { user_id: userId },
                 {
                     $push: { products: objectCart },
                 }
@@ -139,10 +141,11 @@ module.exports.addPost = async (req, res) => {
 // [DELETE] /cart/delete/:productId
 module.exports.deleteItem = async (req, res) => {
     try {
+        const userId = req.cookies.user;
         const productId = req.params.productId;
         console.log(productId);
         await Cart.updateMany({
-            user_id: "6691057efbb258c025f7fa5a",
+            user_id: userId,
         }, {
             $pull: { products: { product_id: productId } }
         })
@@ -154,6 +157,30 @@ module.exports.deleteItem = async (req, res) => {
         res.json({
             code: 400,
             msg: "Thất bại"
+        })
+    }
+}
+
+// [PATCH] /cart/update/
+module.exports.updateQuantity = async (req, res) => {
+    try {
+        const userId = req.cookies.user;
+        const quantity = req.body.quantity;
+        const productId = req.body.productId;
+        await Cart.updateOne({
+            user_id: userId,
+            "products.product_id": productId
+        }, {
+            $set: { "products.$.quantity": quantity }
+        });
+        return res.json({
+            code: 200,
+            msg: "Thành công"
+        })
+    } catch (error) {
+        return res.json({
+            code: 400,
+            msg: "Không thành công"
         })
     }
 }

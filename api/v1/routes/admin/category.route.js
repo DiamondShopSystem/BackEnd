@@ -10,7 +10,6 @@ router.get("/create",
     controller.createGet);
 
 router.get("/" , 
-
     controller.getCategory);
 
 router.get("/detail/:id" , 

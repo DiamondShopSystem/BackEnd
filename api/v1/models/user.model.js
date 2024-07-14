@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema(
         fullName: {
             type: String,
             default: ""
+        },
+        address: {
+            type: String,
+            default: ""
         }
     },
 

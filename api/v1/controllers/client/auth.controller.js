@@ -7,11 +7,13 @@ require('dotenv').config();
 module.exports.login = async (req, res) => {
     try {
         const phoneNumber = req.body.phoneNumber;
-
+        console.log(phoneNumber);
         const user = await User.findOne({
             phoneNumber: phoneNumber,
             deleted: false,
         });
+        console.log(user);
+
         const accessToken = jwt.sign(
             { 'phoneNumber': phoneNumber },
             process.env.ACCESS_TOKEN_SECRET,
@@ -22,12 +24,17 @@ module.exports.login = async (req, res) => {
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '1d' }
         );
-        if (!user) {
+        if (user == null) {
+
             const record = new User(req.body);
             await record.save();
-
+            const cart = new Cart({
+                user_id: record.id
+            })
+            await cart.save();
             res.cookie('jwt', refreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 7 * 24 * 60 * 60 * 1000 });
-            res.cookie("user", user, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 7 * 24 * 60 * 60 * 1000 });
+            res.cookie("user", user.id);
+            res.cookie("cart", cart.id)
             return res.json({
                 record: record,
                 accessToken: accessToken,
@@ -35,8 +42,20 @@ module.exports.login = async (req, res) => {
                 msg: "Tạo tài khoản thành công!"
             });
         } else {
+            const cart = await Cart.findOne({
+                user_id: user.id
+            })
+            if (!cart) {
+                cart = new Cart({
+                    user_id: user.id
+                })
+                console.log("---");
+                console.log(cart);
+                await cart.save();
+            }
             res.cookie('jwt', refreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 7 * 24 * 60 * 60 * 1000 });
-            res.cookie("user", user, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 7 * 24 * 60 * 60 * 1000 });
+            res.cookie("user", user.id);
+            res.cookie("cart", cart.id)
             return res.json({
                 record: user,
                 accessToken: accessToken,
@@ -105,7 +124,8 @@ module.exports.logout = async (req, res) => {
     })
     if (!account) {
         res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
-        res.clearCookie('user', { httpOnly: true, sameSite: 'None', secure: true });
+        res.clearCookie('user');
+        res.clearCookie('cart');
     }
 
     res.json({
