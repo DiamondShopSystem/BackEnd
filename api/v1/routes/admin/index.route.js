@@ -4,6 +4,7 @@ const authRoutes = require("./auth.route");
 const productRoutes = require("./product.route");
 const roleRoutes = require("./role.route");
 const dashboardRoutes = require("./dashboard.route");
+const diamondRoutes = require("./diamond.route")
 const systemConfig = require("../../../../config/system");
 
 module.exports = (app) => {
@@ -19,6 +20,8 @@ module.exports = (app) => {
     app.use(version + `${PATH_ADMIN}/account`, accountRoutes);
 
     app.use(version + `${PATH_ADMIN}/product`, productRoutes);
+
+    app.use(version + `${PATH_ADMIN}/diamond`, diamondRoutes);
 
     app.use(version + `${PATH_ADMIN}/category`, categoryRoutes);
 

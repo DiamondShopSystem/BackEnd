@@ -1,5 +1,6 @@
 const Product = require("../../models/product.model");
 const Category = require("../../models/category.model");
+const Diamond = require("../../models/diamond.model");
 
 // [GET] /products/:slugCategory
 module.exports.category = async (req, res) => {
@@ -44,6 +45,16 @@ module.exports.category = async (req, res) => {
             status: "active",
             deleted: false
         });
+        const diamonds = await Diamond.find({
+            category_id: {
+                $in: [
+                    category.id,
+                    ...allCagegoryId
+                ]
+            },
+            status: "active",
+            deleted: false
+        })
         // for (const item of products) {
         //     item.priceNew = (item.price * (100 - item.discountPercentage) / 100).toFixed(0);
         // }
@@ -52,6 +63,7 @@ module.exports.category = async (req, res) => {
 
         return res.json({
             records: products,
+            diamonds: diamonds,
             code: 200,
             msg: "Thành công"
         });
@@ -72,11 +84,17 @@ module.exports.productDetail = async (req, res) => {
             deleted: false,
             status: "active"
         });
+        const diamond = await Diamond.findOne({
+            _id: id,
+            deleted: false,
+            status: "active"
+        });
 
         res.json({
             code: 200,
             msg: "Thành công",
-            record: product
+            record: product,
+            diamond : diamond
         })
     } catch (error) {
         res.json({
